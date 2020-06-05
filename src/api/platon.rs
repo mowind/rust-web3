@@ -6,7 +6,7 @@ use crate::types::{
     Address, Block, BlockId, BlockNumber, Bytes, CallRequest, Index, Log, SyncState, Transaction, TransactionId,
     TransactionReceipt, TransactionRequest, Work, H256, H520, H64, U256, U64,
 };
-use crate::Transaction;
+use crate::Transport;
 
 /// `PlatON` namespace
 #[derive(Debug, Clone)]
@@ -30,7 +30,7 @@ impl<T: Transport> Namespace<T> for PlatON<T> {
 impl<T: Transport> PlatON<T> {
     /// Get list of available accounts.
     pub fn accounts(&self) -> CallFuture<Vec<Address>, T::Out> {
-        CallFuture::new(self.transpport.execute("platon_accounts", vec![]))
+        CallFuture::new(self.transport.execute("platon_accounts", vec![]))
     }
 
     /// Get current block number.
@@ -71,13 +71,13 @@ impl<T: Transport> PlatON<T> {
     /// Get balance of given address
     pub fn balance(&self, address: Address, block: Option<BlockNumber>) -> CallFuture<U256, T::Out> {
         let address = helpers::serialize(&address);
-        let block = helpers::serialize(block.unwrap_or(BlockNumber::Latest));
+        let block = helpers::serialize(&block.unwrap_or(BlockNumber::Latest));
 
         CallFuture::new(self.transport.execute("platon_balance", vec![address, block]))
     }
 
     /// Get block detail with transaction hashes.
-    pub fn block(&self, block: BlockId) -> CallFuture<Option<Block>, T::Out> {
+    pub fn block(&self, block: BlockId) -> CallFuture<Option<Block<H256>>, T::Out> {
         let include_txs = helpers::serialize(&false);
 
         let result = match block {
@@ -96,7 +96,7 @@ impl<T: Transport> PlatON<T> {
     }
 
     /// Get block details with full transaction objects.
-    pub fn block_with_txs(&self, block: BlockId) -> CallFuture<Option<Block>, T::Out> {
+    pub fn block_with_txs(&self, block: BlockId) -> CallFuture<Option<Block<Transaction>>, T::Out> {
         let include_txs = helpers::serialize(&true);
 
         let result = match block {
@@ -133,7 +133,7 @@ impl<T: Transport> PlatON<T> {
     }
 
     /// Get code under given address.
-    pub fn code(&self, address: Address, block: Option<BlockNumber>) -> CallFuture<Bytes, T::out> {
+    pub fn code(&self, address: Address, block: Option<BlockNumber>) -> CallFuture<Bytes, T::Out> {
         let address = helpers::serialize(&address);
         let block = helpers::serialize(&block.unwrap_or(BlockNumber::Latest));
 
