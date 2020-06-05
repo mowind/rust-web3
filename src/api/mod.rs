@@ -9,6 +9,7 @@ mod parity;
 mod parity_accounts;
 mod parity_set;
 mod personal;
+mod platon;
 mod traces;
 mod web3;
 
@@ -21,6 +22,7 @@ pub use self::parity::Parity;
 pub use self::parity_accounts::ParityAccounts;
 pub use self::parity_set::ParitySet;
 pub use self::personal::Personal;
+pub use self::platon::PlatON;
 pub use self::traces::Traces;
 pub use self::web3::Web3 as Web3Api;
 
@@ -102,6 +104,11 @@ impl<T: Transport> Web3<T> {
 
     /// Access methods from `personal` namespace
     pub fn personal(&self) -> personal::Personal<T> {
+        self.api()
+    }
+
+    /// Access methods from `platon` namespace
+    pub fn platon(&self) -> platon::PlatON<T> {
         self.api()
     }
 
