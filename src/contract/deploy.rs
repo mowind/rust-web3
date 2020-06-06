@@ -5,7 +5,7 @@ use futures::{Async, Future, Poll};
 use rustc_hex::{FromHex, ToHex};
 use std::{collections::HashMap, time};
 
-use crate::api::{Eth, Namespace};
+use crate::api::{Eth, Namespace, PlatON};
 use crate::confirm;
 use crate::contract::tokens::Tokenize;
 use crate::contract::{Contract, Options};
@@ -17,7 +17,7 @@ pub use crate::contract::error::deploy::Error;
 /// A configuration builder for contract deployment.
 #[derive(Debug)]
 pub struct Builder<T: Transport> {
-    pub(crate) eth: Eth<T>,
+    pub(crate) eth: PlatON<T>,
     pub(crate) abi: ethabi::Contract,
     pub(crate) options: Options,
     pub(crate) confirmations: usize,
@@ -159,7 +159,7 @@ pub struct PendingContract<
     T: Transport,
     F: Future<Item = TransactionReceipt, Error = crate::error::Error> = confirm::SendTransactionWithConfirmation<T>,
 > {
-    eth: Option<Eth<T>>,
+    eth: Option<PlatON<T>>,
     abi: Option<ethabi::Contract>,
     waiting: F,
 }

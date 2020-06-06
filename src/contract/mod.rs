@@ -2,7 +2,7 @@
 
 use ethabi;
 
-use crate::api::{Eth, Namespace};
+use crate::api::{Eth, Namespace, PlatON};
 use crate::confirm;
 use crate::contract::tokens::{Detokenize, Tokenize};
 use crate::types::{Address, BlockId, Bytes, CallRequest, TransactionCondition, TransactionRequest, H256, U256};
@@ -48,13 +48,13 @@ impl Options {
 #[derive(Debug, Clone)]
 pub struct Contract<T: Transport> {
     address: Address,
-    eth: Eth<T>,
+    eth: PlatON<T>,
     abi: ethabi::Contract,
 }
 
 impl<T: Transport> Contract<T> {
     /// Creates deployment builder for a contract given it's ABI in JSON.
-    pub fn deploy(eth: Eth<T>, json: &[u8]) -> Result<deploy::Builder<T>, ethabi::Error> {
+    pub fn deploy(eth: PlatON<T>, json: &[u8]) -> Result<deploy::Builder<T>, ethabi::Error> {
         let abi = ethabi::Contract::load(json)?;
         Ok(deploy::Builder {
             eth,
@@ -68,7 +68,7 @@ impl<T: Transport> Contract<T> {
 
     /// test
     pub fn deploy_from_truffle<S>(
-        eth: Eth<T>,
+        eth: PlatON<T>,
         json: &[u8],
         linker: HashMap<S, Address>,
     ) -> Result<deploy::Builder<T>, ethabi::Error>
@@ -90,12 +90,12 @@ impl<T: Transport> Contract<T> {
 
 impl<T: Transport> Contract<T> {
     /// Creates new Contract Interface given blockchain address and ABI
-    pub fn new(eth: Eth<T>, address: Address, abi: ethabi::Contract) -> Self {
+    pub fn new(eth: PlatON<T>, address: Address, abi: ethabi::Contract) -> Self {
         Contract { address, eth, abi }
     }
 
     /// Creates new Contract Interface given blockchain address and JSON containing ABI
-    pub fn from_json(eth: Eth<T>, address: Address, json: &[u8]) -> Result<Self, ethabi::Error> {
+    pub fn from_json(eth: PlatON<T>, address: Address, json: &[u8]) -> Result<Self, ethabi::Error> {
         let abi = ethabi::Contract::load(json)?;
         Ok(Self::new(eth, address, abi))
     }

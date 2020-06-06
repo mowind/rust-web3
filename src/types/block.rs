@@ -10,8 +10,8 @@ pub struct BlockHeader {
     #[serde(rename = "parentHash")]
     pub parent_hash: H256,
     /// Hash of the uncles
-    #[serde(rename = "sha3Uncles")]
-    pub uncles_hash: H256,
+    //#[serde(rename = "sha3Uncles")]
+    //  pub uncles_hash: H256,
     /// Miner/author's address.
     #[serde(rename = "miner")]
     pub author: H160,
@@ -41,12 +41,12 @@ pub struct BlockHeader {
     /// Timestamp
     pub timestamp: U256,
     /// Difficulty
-    pub difficulty: U256,
+    // pub difficulty: U256,
     /// Mix Hash
     #[serde(rename = "mixHash")]
     pub mix_hash: Option<H256>,
     /// Nonce
-    pub nonce: Option<H64>,
+    pub nonce: Bytes,
 }
 
 /// The block type returned from RPC calls.
@@ -59,8 +59,8 @@ pub struct Block<TX> {
     #[serde(rename = "parentHash")]
     pub parent_hash: H256,
     /// Hash of the uncles
-    #[serde(rename = "sha3Uncles")]
-    pub uncles_hash: H256,
+    //#[serde(rename = "sha3Uncles")]
+    //pub uncles_hash: H256,
     /// Miner/author's address.
     #[serde(rename = "miner")]
     pub author: H160,
@@ -90,15 +90,15 @@ pub struct Block<TX> {
     /// Timestamp
     pub timestamp: U256,
     /// Difficulty
-    pub difficulty: U256,
+    //pub difficulty: U256,
     /// Total difficulty
-    #[serde(rename = "totalDifficulty")]
-    pub total_difficulty: Option<U256>,
+    //#[serde(rename = "totalDifficulty")]
+    //  pub total_difficulty: Option<U256>,
     /// Seal fields
     #[serde(default, rename = "sealFields")]
     pub seal_fields: Vec<Bytes>,
     /// Uncles' hashes
-    pub uncles: Vec<H256>,
+    //pub uncles: Vec<H256>,
     /// Transactions
     pub transactions: Vec<TX>,
     /// Size in bytes
@@ -107,7 +107,7 @@ pub struct Block<TX> {
     #[serde(rename = "mixHash")]
     pub mix_hash: Option<H256>,
     /// Nonce
-    pub nonce: Option<H64>,
+    pub nonce: Bytes,
 }
 
 /// Block Number
