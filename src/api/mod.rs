@@ -1,6 +1,7 @@
 //! `Web3` implementation
 
 mod accounts;
+mod debug;
 mod eth;
 mod eth_filter;
 mod eth_subscribe;
@@ -14,6 +15,7 @@ mod traces;
 mod web3;
 
 pub use self::accounts::{Accounts, SignTransactionFuture};
+//pub use self::debug::Debug;
 pub use self::eth::Eth;
 pub use self::eth_filter::{BaseFilter, CreateFilter, EthFilter, FilterStream};
 pub use self::eth_subscribe::{EthSubscribe, SubscriptionId, SubscriptionResult, SubscriptionStream};
@@ -114,6 +116,11 @@ impl<T: Transport> Web3<T> {
 
     /// Access methods from `trace` namespace
     pub fn trace(&self) -> traces::Traces<T> {
+        self.api()
+    }
+
+    /// Access methods from `debug` namespace
+    pub fn debug(&self) -> debug::Debug<T> {
         self.api()
     }
 
