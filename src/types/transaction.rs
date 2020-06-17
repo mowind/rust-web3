@@ -18,9 +18,9 @@ pub struct Transaction {
     #[serde(rename = "transactionIndex")]
     pub transaction_index: Option<Index>,
     /// Sender
-    pub from: H160,
+    pub from: Bytes,
     /// Recipient (None when contract creation)
-    pub to: Option<H160>,
+    pub to: Option<String>,
     /// Transfered value
     pub value: U256,
     /// Gas Price
