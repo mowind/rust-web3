@@ -4,33 +4,33 @@ use serde::{ser::SerializeStruct, Deserialize, Serialize, Serializer};
 // The consensus status returned from RPC calls.
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct ConsensusStatus {
-    state: State,
-    validator: bool,
+    pub state: State,
+    pub validator: bool,
 }
 
 /// The view state
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct State {
-    view: View,
+    pub view: View,
     #[serde(rename = "highestCommitBlock")]
-    committed: QCBlock,
+    pub committed: QCBlock,
     #[serde(rename = "highestLockBlock")]
-    locked: QCBlock,
+    pub locked: QCBlock,
     #[serde(rename = "highestQCBlock")]
-    qc: QCBlock,
+    pub qc: QCBlock,
 }
 
 /// View
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct View {
-    epoch: u64,
+    pub epoch: u64,
     #[serde(rename = "viewNumber")]
-    view: u64,
+    pub view: u64,
 }
 
 /// QC Block
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct QCBlock {
-    hash: H256,
-    number: u64,
+    pub hash: H256,
+    pub number: u64,
 }
