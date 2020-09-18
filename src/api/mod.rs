@@ -4,13 +4,14 @@ mod accounts;
 mod debug;
 mod eth;
 mod eth_filter;
-mod eth_subscribe;
+//mod eth_subscribe;
 mod net;
 mod parity;
 mod parity_accounts;
 mod parity_set;
 mod personal;
 mod platon;
+mod platon_subscribe;
 mod traces;
 mod web3;
 
@@ -18,13 +19,14 @@ pub use self::accounts::{Accounts, SignTransactionFuture};
 //pub use self::debug::Debug;
 pub use self::eth::Eth;
 pub use self::eth_filter::{BaseFilter, CreateFilter, EthFilter, FilterStream};
-pub use self::eth_subscribe::{EthSubscribe, SubscriptionId, SubscriptionResult, SubscriptionStream};
+//pub use self::eth_subscribe::{EthSubscribe, SubscriptionId, SubscriptionResult, SubscriptionStream};
 pub use self::net::Net;
 pub use self::parity::Parity;
 pub use self::parity_accounts::ParityAccounts;
 pub use self::parity_set::ParitySet;
 pub use self::personal::Personal;
 pub use self::platon::PlatON;
+pub use self::platon_subscribe::{PlatONSubscribe, SubscriptionId, SubscriptionResult, SubscriptionStream};
 pub use self::traces::Traces;
 pub use self::web3::Web3 as Web3Api;
 
@@ -161,7 +163,12 @@ impl<T: Transport> Web3<T> {
 
 impl<T: DuplexTransport> Web3<T> {
     /// Access subscribe methods from `eth` namespace
-    pub fn eth_subscribe(&self) -> eth_subscribe::EthSubscribe<T> {
+    //pub fn eth_subscribe(&self) -> eth_subscribe::EthSubscribe<T> {
+    //self.api()
+    //}
+
+    /// Access subscribe methods from `PlatON` namespace
+    pub fn platon_subscribe(&self) -> platon_subscribe::PlatONSubscribe<T> {
         self.api()
     }
 }
