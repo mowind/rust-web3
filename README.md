@@ -19,25 +19,25 @@ First, add this to your `Cargo.toml`:
 web3 = { git = "https://github.com/tomusdrw/rust-web3" }
 ```
 
-Next, add this to your crate:
-
+## Example
 ```rust
-extern crate web3;
-```
+#[tokio::main]
+async fn main() -> web3::Result<()> {
+    let transport = web3::transports::Http::new("http://localhost:8545")?;
+    let web3 = web3::Web3::new(transport);
 
-## Examples
-```rust
-extern crate web3;
+    println!("Calling accounts.");
+    let mut accounts = web3.eth().accounts().await?;
+    println!("Accounts: {:?}", accounts);
+    accounts.push("00a329c0648769a73afac7f9381e08fb43dbea72".parse().unwrap());
 
-use web3::futures::Future;
+    println!("Calling balance.");
+    for account in accounts {
+        let balance = web3.eth().balance(account, None).await?;
+        println!("Balance of {:?}: {}", account, balance);
+    }
 
-fn main() {
-  let (_eloop, transport) = web3::transports::Http::new("http://localhost:8545").unwrap();
-
-  let web3 = web3::Web3::new(transport);
-  let accounts = web3.eth().accounts().wait().unwrap();
-
-  println!("Accounts: {:?}", accounts);
+    Ok(())
 }
 ```
 
@@ -48,6 +48,20 @@ If you want to deploy smart contracts you have written you can do something like
 The solidity compiler is generating the binary and abi code for the smart contracts in a directory called contracts and is being output to a directory called build.
 
 For more see [examples folder](./examples).
+
+# Opt-out Features
+- `http` - Enables HTTP transport (requires `tokio` runtime, because of `hyper`).
+- `http-tls` - Enables TLS support for HTTP transport (implies `http`).
+- `ws` - Enables WS transport.
+- `ws-tls` - Enables TLS support for WS transport (implies `ws`).
+
+## Futures migration
+- [ ] Get rid of parking_lot (replace with async-aware locks if really needed).
+- [ ] Consider getting rid of `Unpin` requirements. (#361)
+- [x] WebSockets: TLS support (#360)
+- [ ] WebSockets: Reconnecting & Pings
+- [x] Consider using `tokio` instead of `async-std` for `ws.rs` transport (issue with test).
+- [ ] Restore IPC Transport
 
 ## General
 - [ ] More flexible API (accept `Into<X>`)
@@ -92,7 +106,19 @@ web3.api::<CustomNamespace>().custom_method().wait().unwrap()
 # Installation on Windows
 
 Currently, Windows does not support IPC, which is enabled in the library by default.
-To complile, you need to disable IPC feature:
+To complile, you need to disable the IPC feature:
 ```
 web3 = { version = "0.11.0", default-features = false, features = ["http"] }
 ```
+
+# Cargo Features
+
+The library supports following features:
+- `http` - Enables `http` transport.
+- `http-tls` - Enables `http` over TLS (`https`) transport support. Implies `http`.
+- `ws-tokio` - Enables `ws` tranport (`tokio` runtime).
+- `ws-tls-tokio` - Enables `wss` tranport (`tokio` runtime).
+- `ws-async-std` - Enables `ws` tranport (`async-std` runtime).
+- `ws-tls-async-std` - Enables `wss` tranport (`async-std` runtime).
+
+By default `http-tls` and `ws-tls-tokio` are enabled.

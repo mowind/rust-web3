@@ -26,7 +26,7 @@ impl<T: Transport> Namespace<T> for Net<T> {
 }
 
 impl<T: Transport> Net<T> {
-    /// Returns protocol version
+    /// Returns the network id.
     pub fn version(&self) -> CallFuture<String, T::Out> {
         CallFuture::new(self.transport.execute("net_version", vec![]))
     }
@@ -44,8 +44,6 @@ impl<T: Transport> Net<T> {
 
 #[cfg(test)]
 mod tests {
-    use futures::Future;
-
     use crate::api::Namespace;
     use crate::rpc::Value;
     use crate::types::U256;

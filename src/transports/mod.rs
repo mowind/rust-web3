@@ -1,33 +1,30 @@
 //! Supported Ethereum JSON-RPC transports.
 
-use crate::Error;
-
-/// RPC Result.
-pub type Result<T> = ::std::result::Result<T, Error>;
-
 pub mod batch;
 pub use self::batch::Batch;
+pub mod either;
+pub use self::either::Either;
 
 #[cfg(feature = "http")]
 pub mod http;
 #[cfg(feature = "http")]
 pub use self::http::Http;
 
-#[cfg(feature = "ipc")]
-pub mod ipc;
-#[cfg(feature = "ipc")]
-pub use self::ipc::Ipc;
-
-#[cfg(feature = "ws")]
+#[cfg(any(feature = "ws-tokio", feature = "ws-async-std"))]
 pub mod ws;
-#[cfg(feature = "ws")]
+#[cfg(any(feature = "ws-tokio", feature = "ws-async-std"))]
 pub use self::ws::WebSocket;
 
-#[cfg(any(feature = "ipc", feature = "http", feature = "ws"))]
-mod shared;
-#[cfg(any(feature = "ipc", feature = "http", feature = "ws"))]
-extern crate tokio_core;
-#[cfg(any(feature = "ipc"))]
-extern crate tokio_io;
-#[cfg(any(feature = "ipc", feature = "http", feature = "ws"))]
-pub use self::shared::EventLoopHandle;
+#[cfg(feature = "url")]
+impl From<url::ParseError> for crate::Error {
+    fn from(err: url::ParseError) -> Self {
+        crate::Error::Transport(format!("{:?}", err))
+    }
+}
+
+#[cfg(feature = "native-tls")]
+impl From<native_tls::Error> for crate::Error {
+    fn from(err: native_tls::Error) -> Self {
+        crate::Error::Transport(format!("{:?}", err))
+    }
+}
