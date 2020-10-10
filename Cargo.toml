@@ -2,11 +2,11 @@
 name = "web3"
 version = "0.13.0"
 description = "Ethereum JSON-RPC client."
-homepage = "https://github.com/tomusdrw/rust-web3"
-repository = "https://github.com/tomusdrw/rust-web3"
+homepage = "https://github.com/mowind/rust-web3"
+repository = "https://github.com/mowind/rust-web3"
 documentation = "https://docs.rs/web3"
 license = "MIT"
-keywords = ["jsonrpc", "web3", "ethereum", "rpc", "client"]
+keywords = ["jsonrpc", "web3", "ethereum", "rpc", "client", "platon"]
 authors = ["Tomasz Drwięga <tomasz@parity.io>"]
 readme = "README.md"
 edition = "2018"
