@@ -6,6 +6,8 @@ use serde::{Deserialize, Serialize};
 pub struct Transaction {
     /// Hash
     pub hash: H256,
+    /// Expiration
+    pub expiration: U256,
     /// Nonce
     pub nonce: U256,
     /// Block hash. None when pending.
@@ -18,7 +20,7 @@ pub struct Transaction {
     #[serde(rename = "transactionIndex")]
     pub transaction_index: Option<Index>,
     /// Sender
-    pub from: Bytes,
+    pub from: String,
     /// Recipient (None when contract creation)
     pub to: Option<String>,
     /// Transfered value
@@ -86,6 +88,8 @@ pub struct RawTransaction {
 pub struct RawTransactionDetails {
     /// Hash
     pub hash: H256,
+    /// Expiration
+    pub expiration: U256,
     /// Nonce
     pub nonce: U256,
     /// Block hash. None when pending.
