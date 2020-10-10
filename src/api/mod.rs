@@ -10,6 +10,7 @@ mod parity_accounts;
 mod parity_set;
 mod personal;
 mod traces;
+mod txpool;
 mod web3;
 
 pub use self::accounts::{Accounts, SignTransactionFuture};
@@ -22,11 +23,12 @@ pub use self::parity_accounts::ParityAccounts;
 pub use self::parity_set::ParitySet;
 pub use self::personal::Personal;
 pub use self::traces::Traces;
+pub use self::txpool::Txpool;
 pub use self::web3::Web3 as Web3Api;
 
 use crate::types::{Bytes, TransactionRequest, U64};
-use crate::{confirm, DuplexTransport, Error, Transport};
-use futures::IntoFuture;
+use crate::{confirm, error, DuplexTransport, Transport};
+use futures::Future;
 use std::time::Duration;
 
 /// Common API for all namespaces
@@ -110,16 +112,21 @@ impl<T: Transport> Web3<T> {
         self.api()
     }
 
+    /// Access methods from `txpool` namespace
+    pub fn txpool(&self) -> txpool::Txpool<T> {
+        self.api()
+    }
+
     /// Should be used to wait for confirmations
     pub fn wait_for_confirmations<F, V>(
         &self,
         poll_interval: Duration,
         confirmations: usize,
         check: V,
-    ) -> confirm::Confirmations<T, V, F::Future>
+    ) -> confirm::Confirmations<T, V, F>
     where
-        F: IntoFuture<Item = Option<U64>, Error = Error>,
-        V: confirm::ConfirmationCheck<Check = F>,
+        F: Future<Output = error::Result<Option<U64>>>,
+        V: confirm::ConfirmationCheck<Check = F> + Unpin,
     {
         confirm::wait_for_confirmations(self.eth(), self.eth_filter(), poll_interval, confirmations, check)
     }
