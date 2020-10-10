@@ -2,7 +2,7 @@
 
 use ethabi;
 
-use crate::api::{Eth, Namespace, PlatON};
+use crate::api::{Accounts, Namespace, PlatON};
 use crate::confirm;
 use crate::contract::tokens::{Detokenize, Tokenize};
 use crate::signing;
@@ -310,64 +310,65 @@ impl<T: Transport> Contract<T> {
             .unwrap_or_else(Into::into)
     }
 
-    /// Find events matching the topics.
-    pub fn events<A, B, C, R>(
+    /*
+        /// Find events matching the topics.
+        pub fn events<A, B, C, R>(
         &self,
-        event: &str,
-        topic0: A,
-        topic1: B,
-        topic2: C,
+            event: &str,
+            topic0: A,
+            topic1: B,
+            topic2: C,
     ) -> impl Future<Output = Result<Vec<R>>>
-    where
-        A: Tokenize,
-        B: Tokenize,
-        C: Tokenize,
-        R: Detokenize,
-    {
-        fn to_topic<A: Tokenize>(x: A) -> ethabi::Topic<ethabi::Token> {
-            let tokens = x.into_tokens();
-            if tokens.is_empty() {
-                ethabi::Topic::Any
-            } else {
-                tokens.into()
-            }
-        }
+        where
+                A: Tokenize,
+                B: Tokenize,
+                C: Tokenize,
+                R: Detokenize,
+            {
+                fn to_topic<A: Tokenize>(x: A) -> ethabi::Topic<ethabi::Token> {
+                    let tokens = x.into_tokens();
+                    if tokens.is_empty() {
+                        ethabi::Topic::Any
+                    } else {
+                        tokens.into()
+                    }
+                }
 
-        let res = self.abi.event(event).and_then(|ev| {
-            let filter = ev.filter(ethabi::RawTopicFilter {
-                topic0: to_topic(topic0),
-                topic1: to_topic(topic1),
-                topic2: to_topic(topic2),
-            })?;
-            Ok((ev.clone(), filter))
-        });
-        let (ev, filter) = match res {
-            Ok(x) => x,
-            Err(e) => return Either::Left(future::ready(Err(e.into()))),
-        };
+                let res = self.abi.event(event).and_then(|ev| {
+                    let filter = ev.filter(ethabi::RawTopicFilter {
+                        topic0: to_topic(topic0),
+                        topic1: to_topic(topic1),
+                        topic2: to_topic(topic2),
+                    })?;
+                    Ok((ev.clone(), filter))
+                });
+                let (ev, filter) = match res {
+                    Ok(x) => x,
+                    Err(e) => return Either::Left(future::ready(Err(e.into()))),
+                };
 
-        Either::Right(
-            self.eth
-                .logs(FilterBuilder::default().topic_filter(filter).build())
-                .map_err(Into::into)
-                .map(move |logs| {
-                    logs.and_then(|logs| {
-                        logs.into_iter()
-                            .map(move |l| {
-                                let log = ev.parse_log(ethabi::RawLog {
-                                    topics: l.topics,
-                                    data: l.data.0,
-                                })?;
+                Either::Right(
+                    self.eth
+                        .logs(FilterBuilder::default().topic_filter(filter).build())
+                        .map_err(Into::into)
+                        .map(move |logs| {
+                            logs.and_then(|logs| {
+                                logs.into_iter()
+                                    .map(move |l| {
+                                        let log = ev.parse_log(ethabi::RawLog {
+                                            topics: l.topics,
+                                            data: l.data.0,
+                                        })?;
 
-                                Ok(R::from_tokens(
-                                    log.params.into_iter().map(|x| x.value).collect::<Vec<_>>(),
-                                )?)
+                                        Ok(R::from_tokens(
+                                            log.params.into_iter().map(|x| x.value).collect::<Vec<_>>(),
+                                        )?)
+                                    })
+                                    .collect::<Result<Vec<R>>>()
                             })
-                            .collect::<Result<Vec<R>>>()
-                    })
-                }),
-        )
-    }
+                        }),
+                )
+        }*/
 }
 
 #[cfg(test)]
