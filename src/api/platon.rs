@@ -34,16 +34,18 @@ impl<T: Transport> PlatON<T> {
     }
 
     /// Get current block number.
-    pub fn block_number(&self) -> CallFuture<U64, T::Out> {
-        CallFuture::new(self.transport.execute("platon_blockNumber", vec![]))
+    pub fn block_number(&self, ledger_name: &String) -> CallFuture<U64, T::Out> {
+        let ledger_name = helpers::serialize(ledger_name);
+        CallFuture::new(self.transport.execute("platon_blockNumber", vec![ledger_name]))
     }
 
     /// Call a constant method of contract without changing the state of the blockchain.
-    pub fn call(&self, req: CallRequest, block: Option<BlockId>) -> CallFuture<Bytes, T::Out> {
+    pub fn call(&self, ledger_name: &String, req: CallRequest, block: Option<BlockId>) -> CallFuture<Bytes, T::Out> {
+        let ledger_name = helpers::serialize(ledger_name);
         let req = helpers::serialize(&req);
         let block = helpers::serialize(&block.unwrap_or(BlockNumber::Latest.into()));
 
-        CallFuture::new(self.transport.execute("platon_call", vec![req, block]))
+        CallFuture::new(self.transport.execute("platon_call", vec![ledger_name, req, block]))
     }
 
     /// Get coinbase address.
@@ -52,43 +54,61 @@ impl<T: Transport> PlatON<T> {
     }
 
     /// Call a contract without changing the state of the blockchain to estimate gas usage.
-    pub fn estimate_gas(&self, req: CallRequest, block: Option<BlockNumber>) -> CallFuture<U256, T::Out> {
+    pub fn estimate_gas(
+        &self,
+        ledger_name: &String,
+        req: CallRequest,
+        block: Option<BlockNumber>,
+    ) -> CallFuture<U256, T::Out> {
+        let ledger_name = helpers::serialize(ledger_name);
         let req = helpers::serialize(&req);
 
         let args = match block {
-            Some(block) => vec![req, helpers::serialize(&block)],
-            None => vec![req],
+            Some(block) => vec![ledger_name, req, helpers::serialize(&block)],
+            None => vec![ledger_name, req],
         };
 
         CallFuture::new(self.transport.execute("platon_estimateGas", args))
     }
 
     /// Get current recommended gas price.
-    pub fn gas_price(&self) -> CallFuture<U256, T::Out> {
-        CallFuture::new(self.transport.execute("platon_gasPrice", vec![]))
+    pub fn gas_price(&self, ledger_name: &String) -> CallFuture<U256, T::Out> {
+        let ledger_name = helpers::serialize(ledger_name);
+        CallFuture::new(self.transport.execute("platon_gasPrice", vec![ledger_name]))
     }
 
     /// Get balance of given address
-    pub fn balance(&self, address: Address, block: Option<BlockNumber>) -> CallFuture<U256, T::Out> {
+    pub fn balance(
+        &self,
+        ledger_name: &String,
+        address: Address,
+        block: Option<BlockNumber>,
+    ) -> CallFuture<U256, T::Out> {
+        let ledger_name = helpers::serialize(ledger_name);
         let address = helpers::serialize(&address);
         let block = helpers::serialize(&block.unwrap_or(BlockNumber::Latest));
 
-        CallFuture::new(self.transport.execute("platon_balance", vec![address, block]))
+        CallFuture::new(
+            self.transport
+                .execute("platon_balance", vec![ledger_name, address, block]),
+        )
     }
 
     /// Get block detail with transaction hashes.
-    pub fn block(&self, block: BlockId) -> CallFuture<Option<Block<H256>>, T::Out> {
+    pub fn block(&self, ledger_name: &String, block: BlockId) -> CallFuture<Option<Block<H256>>, T::Out> {
+        let ledger_name = helpers::serialize(ledger_name);
         let include_txs = helpers::serialize(&false);
 
         let result = match block {
             BlockId::Hash(hash) => {
                 let hash = helpers::serialize(&hash);
-                self.transport.execute("platon_getBlockByHash", vec![hash, include_txs])
+                self.transport
+                    .execute("platon_getBlockByHash", vec![ledger_name, hash, include_txs])
             }
             BlockId::Number(num) => {
                 let num = helpers::serialize(&num);
                 self.transport
-                    .execute("platon_getBlockByNumber", vec![num, include_txs])
+                    .execute("platon_getBlockByNumber", vec![ledger_name, num, include_txs])
             }
         };
 
@@ -96,18 +116,24 @@ impl<T: Transport> PlatON<T> {
     }
 
     /// Get block details with full transaction objects.
-    pub fn block_with_txs(&self, block: BlockId) -> CallFuture<Option<Block<Transaction>>, T::Out> {
+    pub fn block_with_txs(
+        &self,
+        ledger_name: &String,
+        block: BlockId,
+    ) -> CallFuture<Option<Block<Transaction>>, T::Out> {
+        let ledger_name = helpers::serialize(ledger_name);
         let include_txs = helpers::serialize(&true);
 
         let result = match block {
             BlockId::Hash(hash) => {
                 let hash = helpers::serialize(&hash);
-                self.transport.execute("platon_getBlockByHash", vec![hash, include_txs])
+                self.transport
+                    .execute("platon_getBlockByHash", vec![ledger_name, hash, include_txs])
             }
             BlockId::Number(num) => {
                 let num = helpers::serialize(&num);
                 self.transport
-                    .execute("platon_getBlockByNumber", vec![num, include_txs])
+                    .execute("platon_getBlockByNumber", vec![ledger_name, num, include_txs])
             }
         };
 
@@ -115,17 +141,18 @@ impl<T: Transport> PlatON<T> {
     }
 
     /// Get number of transactions in block.
-    pub fn block_transaction_count(&self, block: BlockId) -> CallFuture<Option<U256>, T::Out> {
+    pub fn block_transaction_count(&self, ledger_name: &String, block: BlockId) -> CallFuture<Option<U256>, T::Out> {
+        let ledger_name = helpers::serialize(ledger_name);
         let result = match block {
             BlockId::Hash(hash) => {
                 let hash = helpers::serialize(&hash);
                 self.transport
-                    .execute("platon_getBlockTransactionCountByHash", vec![hash])
+                    .execute("platon_getBlockTransactionCountByHash", vec![ledger_name, hash])
             }
             BlockId::Number(num) => {
                 let num = helpers::serialize(&num);
                 self.transport
-                    .execute("platon_getBlockTransactionCountByNumber", vec![num])
+                    .execute("platon_getBlockTransactionCountByNumber", vec![ledger_name, num])
             }
         };
 
@@ -133,36 +160,53 @@ impl<T: Transport> PlatON<T> {
     }
 
     /// Get code under given address.
-    pub fn code(&self, address: Address, block: Option<BlockNumber>) -> CallFuture<Bytes, T::Out> {
-        let address = helpers::serialize(&address);
-        let block = helpers::serialize(&block.unwrap_or(BlockNumber::Latest));
-
-        CallFuture::new(self.transport.execute("platon_getCode", vec![address, block]))
-    }
-
-    /// Get nonce.
-    pub fn transaction_count(&self, address: Address, block: Option<BlockNumber>) -> CallFuture<U256, T::Out> {
+    pub fn code(
+        &self,
+        ledger_name: &String,
+        address: Address,
+        block: Option<BlockNumber>,
+    ) -> CallFuture<Bytes, T::Out> {
+        let ledger_name = helpers::serialize(ledger_name);
         let address = helpers::serialize(&address);
         let block = helpers::serialize(&block.unwrap_or(BlockNumber::Latest));
 
         CallFuture::new(
             self.transport
-                .execute("platon_getTransactionCount", vec![address, block]),
+                .execute("platon_getCode", vec![ledger_name, address, block]),
+        )
+    }
+
+    /// Get nonce.
+    pub fn transaction_count(
+        &self,
+        ledger_name: &String,
+        address: Address,
+        block: Option<BlockNumber>,
+    ) -> CallFuture<U256, T::Out> {
+        let ledger_name = helpers::serialize(ledger_name);
+        let address = helpers::serialize(&address);
+        let block = helpers::serialize(&block.unwrap_or(BlockNumber::Latest));
+
+        CallFuture::new(
+            self.transport
+                .execute("platon_getTransactionCount", vec![ledger_name, address, block]),
         )
     }
 
     /// Get transaction.
-    pub fn transaction(&self, id: TransactionId) -> CallFuture<Option<Transaction>, T::Out> {
+    pub fn transaction(&self, ledger_name: &String, id: TransactionId) -> CallFuture<Option<Transaction>, T::Out> {
+        let ledger_name = helpers::serialize(ledger_name);
         let result = match id {
             TransactionId::Hash(hash) => {
                 let hash = helpers::serialize(&hash);
-                self.transport.execute("platon_getTransactionByHash", vec![hash])
+                self.transport
+                    .execute("platon_getTransactionByHash", vec![ledger_name, hash])
             }
             TransactionId::Block(BlockId::Hash(hash), index) => {
                 let hash = helpers::serialize(&hash);
                 let idx = helpers::serialize(&index);
                 self.transport
-                    .execute("platon_getTransactionByBlockHashAndIndex", vec![hash, idx])
+                    .execute("platon_getTransactionByBlockHashAndIndex", vec![ledger_name, hash, idx])
             }
             TransactionId::Block(BlockId::Number(num), index) => {
                 let num = helpers::serialize(&num);
@@ -176,33 +220,38 @@ impl<T: Transport> PlatON<T> {
     }
 
     /// Get transaction receipt.
-    pub fn transaction_receipt(&self, hash: H256) -> CallFuture<Option<TransactionReceipt>, T::Out> {
+    pub fn transaction_receipt(&self, ledger_name: &String,hash: H256) -> CallFuture<Option<TransactionReceipt>, T::Out> {
+        let ledger_name = helpers::serialize(ledger_name);
         let hash = helpers::serialize(&hash);
 
-        CallFuture::new(self.transport.execute("platon_getTransactionReceipt", vec![hash]))
+        CallFuture::new(self.transport.execute("platon_getTransactionReceipt", vec![ledger_name,hash]))
     }
 
     /// Sends a rlp-encoded signed transaction.
-    pub fn send_raw_transaction(&self, rlp: Bytes) -> CallFuture<H256, T::Out> {
+    pub fn send_raw_transaction(&self, ledger_name: &String,rlp: Bytes) -> CallFuture<H256, T::Out> {
+        let ledger_name = helpers::serialize(ledger_name);
         let rlp = helpers::serialize(&rlp);
-        CallFuture::new(self.transport.execute("platon_sendRawTransaction", vec![rlp]))
+        CallFuture::new(self.transport.execute("platon_sendRawTransaction", vec![ledger_name,rlp]))
     }
 
     /// Sends a transaction.
-    pub fn send_transaction(&self, tx: TransactionRequest) -> CallFuture<H256, T::Out> {
+    pub fn send_transaction(&self, ledger_name: &String,tx: TransactionRequest) -> CallFuture<H256, T::Out> {
+        let ledger_name = helpers::serialize(ledger_name);
         let tx = helpers::serialize(&tx);
-        CallFuture::new(self.transport.execute("platon_sendTransaction", vec![tx]))
+        CallFuture::new(self.transport.execute("platon_sendTransaction", vec![ledger_name,tx]))
     }
 
     /// Signs a hash of given data.
-    pub fn sign(&self, address: Address, data: Bytes) -> CallFuture<H520, T::Out> {
+    pub fn sign(&self, ledger_name: &String,address: Address, data: Bytes) -> CallFuture<H520, T::Out> {
+        let ledger_name = helpers::serialize(ledger_name);
         let address = helpers::serialize(&address);
         let data = helpers::serialize(&data);
-        CallFuture::new(self.transport.execute("platon_sign", vec![address, data]))
+        CallFuture::new(self.transport.execute("platon_sign", vec![ledger_name,address, data]))
     }
 
     /// Get syncing status.
-    pub fn syncing(&self) -> CallFuture<SyncState, T::Out> {
-        CallFuture::new(self.transport.execute("platon_syncing", vec![]))
+    pub fn syncing(&self, ledger_name: &String) -> CallFuture<SyncState, T::Out> {
+        let ledger_name = helpers::serialize(ledger_name);
+        CallFuture::new(self.transport.execute("platon_syncing", vec![ledger_name]))
     }
 }

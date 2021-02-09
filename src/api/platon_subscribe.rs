@@ -132,9 +132,13 @@ where
 
 impl<T: DuplexTransport> PlatONSubscribe<T> {
     /// Create new heads subscription
-    pub fn subscribe_new_heads(&self) -> SubscriptionResult<T, BlockHeader> {
+    pub fn subscribe_new_heads(&self, ledger_name: &String) -> SubscriptionResult<T, BlockHeader> {
+        let ledger_name = helpers::serialize(ledger_name);
         let subscription = helpers::serialize(&&"newHeads");
-        let id_future = CallFuture::new(self.transport.execute("platon_subscribe", vec![subscription]));
+        let id_future = CallFuture::new(
+            self.transport
+                .execute("platon_subscribe", vec![subscription, ledger_name]),
+        );
         SubscriptionResult::new(self.transport().clone(), id_future)
     }
 }
