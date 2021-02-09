@@ -26,7 +26,8 @@ impl<T: Transport> Namespace<T> for Debug<T> {
 
 impl<T: Transport> Debug<T> {
     /// Get CBFT consensus status
-    pub fn consensus_status(&self) -> CallFuture<ConsensusStatus, T::Out> {
-        CallFuture::new(self.transport.execute("debug_consensusStatus", vec![]))
+    pub fn consensus_status(&self, ledger_name: &String) -> CallFuture<ConsensusStatus, T::Out> {
+        let ledger_name = helpers::serialize(ledger_name);
+        CallFuture::new(self.transport.execute("debug_consensusStatus", vec![ledger_name]))
     }
 }
